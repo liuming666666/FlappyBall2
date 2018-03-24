@@ -114,7 +114,7 @@
       "y": 0
     },
     "_angularVelocity": 0,
-    "_fixedRotation": false,
+    "_fixedRotation": true,
     "enabledContactListener": false,
     "bullet": false
   },
@@ -129,15 +129,15 @@
     "tag": 0,
     "_density": 1,
     "_sensor": false,
-    "_friction": 0.2,
+    "_friction": 0.8,
     "_restitution": 0,
     "body": null,
     "_offset": {
       "__type__": "cc.Vec2",
-      "x": -70,
-      "y": 0
+      "x": 66,
+      "y": -4
     },
-    "_radius": 8
+    "_radius": 13
   },
   {
     "__type__": "cc.PhysicsCircleCollider",
@@ -150,15 +150,15 @@
     "tag": 0,
     "_density": 1,
     "_sensor": false,
-    "_friction": 0.2,
+    "_friction": 0.8,
     "_restitution": 0,
     "body": null,
     "_offset": {
       "__type__": "cc.Vec2",
-      "x": 70,
-      "y": 0
+      "x": -66,
+      "y": -4
     },
-    "_radius": 8
+    "_radius": 13
   },
   {
     "__type__": "cc.PrefabInfo",
