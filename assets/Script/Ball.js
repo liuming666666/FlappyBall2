@@ -87,12 +87,13 @@ cc.Class({
                 }
                 //console.log(this.game.getComponent("Rim").rims[this.game.getComponent("Rim").rims.length-1].topRim.x);
                 //检查第一个篮圈是否达到边界，是结束游戏
-                /*if(this.game.getComponent("Rim").rims[this.game.getComponent("Rim").rims.length-1].topRim.x + 360 < 0) {
+                if(this.game.getComponent("Rim").rims.length > 0 && this.game.getComponent("Rim").rims[0].topRim.x + 360 < 0) {
                     this.game.getComponent("Game").gameOver();
-                }*/
+                }
                 this.game.getComponent("Rim").rims.forEach((rim,index) => {
                 //上下篮筐都移动，根据球的速度
                 for(let key in rim) {
+                    //console.log(rim[key]);
                     rim[key].x -= (this.getComponent(cc.RigidBody).linearVelocity.x + this.rimRelativeSpeed)*dt;
                 }
 

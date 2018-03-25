@@ -32,7 +32,7 @@ cc.Class({
     init: function() {
         this.score = 0;     //初始化游戏分数
         this.status = Status.Run;   //设置游戏状态为Run
-
+        this.getComponent("Rim").rims = [];
     },
 
     /**
@@ -80,7 +80,12 @@ cc.Class({
             this.ball.getComponent("Ball").controlBall,this.ball);
         this.playBtn.active = true;    //显示开始按钮
         this.mask.active = true;   //显示遮罩层
-
+        //摧毁所有的篮筐
+        this.getComponent("Rim").rims.forEach((rim,index) => {
+            for(let key in rim) {
+                rim[key].destroy();
+            }
+        });
     },
 
     // called every frame
