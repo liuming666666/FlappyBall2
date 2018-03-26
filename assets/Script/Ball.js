@@ -14,7 +14,10 @@ cc.Class({
         //篮圈相对篮球的速度
         rimRelativeSpeed: 0,
         //game
-        game: cc.Node     
+        game: cc.Node,
+        //touch音效
+        touchAudio: cc.AudioClip,
+        ballFire: cc.Node     //球火
     },
 
     onLoad: function() {
@@ -36,6 +39,11 @@ cc.Class({
      */
     controlBall: function() {
         //this.node.getComponent(cc.RigidBody).linearDamping = 0;
+        //播放touch音效
+        cc.audioEngine.play(this.getComponent("Ball").touchAudio,false,1);
+        if(this.getComponent(cc.RigidBody).type != 2) {
+            this.getComponent(cc.RigidBody).type = 2;
+        }
         //这里的this是篮球刚体
         this.node.getComponent(cc.RigidBody).linearVelocity = {x:initSpeed,y:0};
         this.node.getComponent("Ball").ballSpeed = initSpeed;
@@ -48,6 +56,11 @@ cc.Class({
      * @return {[type]} [description]
      */
     onBeginContact: function (contact, selfCollider, otherCollider) {
+        if(otherCollider.sensor != true) {
+            //碰撞关闭球火
+        this.ballFire.getComponent(cc.ParticleSystem).stopSystem();
+        }
+        
         //碰撞后获取篮球速度
         //this.ballSpeed = selfCollider.getComponent(cc.RigidBody).linearVelocity.x;
     },

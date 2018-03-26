@@ -28,10 +28,13 @@
       },
       {
         "__id__": 5
+      },
+      {
+        "__id__": 6
       }
     ],
     "_prefab": {
-      "__id__": 6
+      "__id__": 7
     },
     "_id": "",
     "_opacity": 255,
@@ -115,7 +118,7 @@
     },
     "_angularVelocity": 0,
     "_fixedRotation": true,
-    "enabledContactListener": false,
+    "enabledContactListener": true,
     "bullet": false
   },
   {
@@ -159,6 +162,19 @@
       "y": -4
     },
     "_radius": 13
+  },
+  {
+    "__type__": "cd93f433C1NAZkAqyqhupKf",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "game": null,
+    "collisionAudio": {
+      "__uuid__": "6fa9289b-0656-4a23-b771-95286e74fcee"
+    }
   },
   {
     "__type__": "cc.PrefabInfo",
