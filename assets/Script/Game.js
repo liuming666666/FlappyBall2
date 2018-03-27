@@ -9,15 +9,16 @@ cc.Class({
 
     properties: {
         scoreLabel: cc.Label,    //分数显示label
-        playBtn: cc.Node,       //开始按钮节点
-        mask: cc.Node,           //遮罩层
+        gameOverNode: cc.Node,      //游戏结束
         ball: cc.RigidBody,      //篮球刚体
         hollowLabel: cc.Node,   //空心动画节点
         startGameAudio: cc.AudioClip,    //开始游戏音效
         failAudio: cc.AudioClip,     //失败音效
         goalAudio: cc.AudioClip,     //得分音效
         hollowAudio: cc.AudioClip,   //空心音效
-        ballFire: cc.Node       //球火的节点
+        ballFire: cc.Node,       //球火的节点
+        bg: cc.Node             //背景节点
+       
     },
 
     statics: {
@@ -26,11 +27,9 @@ cc.Class({
 
     // use this for initialization
     onLoad: function () {
-        //设置游戏状态为Menu
-        this.status = Status.Menu;
-        //设置遮罩层和play按钮的zorder
-        this.mask.setLocalZOrder(4);
-        this.playBtn.setLocalZOrder(5);
+        setTimeout(() => {
+            this.startGame();
+        },1);
         //记录球的初始位置
         this.ballInit = this.ball.node.getPosition();
     },
@@ -46,10 +45,11 @@ cc.Class({
         this.sequentHollowNumber = 0;  //连续空心球数量
         this.getComponent("Rim").rims = [];
         this.ball.node.setPosition(this.ballInit);
+        this.ball.node.setRotation(0);
+        this.ball.getComponent("Ball").init();
         this.ball.linearVelocity = {x: 0,y: 0}; //设置篮球的线速度为零
         this.ball.angularVelocity = 0; //设置篮球角速度为零
         this.ball.getComponent(cc.RigidBody).type = 1;
-        //console.log(this.ball.linearVelocity);
     },
 
     /**
@@ -58,10 +58,11 @@ cc.Class({
      */
     startGame: function() {
         this.init();    //初始化参数
-        this.playBtn.active = false;    //隐藏开始按钮
-        this.mask.active = false;   //隐藏遮罩层
+        this.gameOverNode.active = false;
         cc.audioEngine.play(this.startGameAudio,false,0.2);  //播放游戏开始音效,音乐文件，是否循环，声音大小
+
         //生成篮筐
+        this.getComponent("Rim").spwnRim();
         this.getComponent("Rim").spwnRim();
         //注册事件篮球touch事件
         this.node.on(cc.Node.EventType.TOUCH_START,
@@ -86,6 +87,8 @@ cc.Class({
             this.ballFire.getComponent(cc.ParticleSystem).resetSystem();
             this.sequentHollowNumber++;   //空心球数量
             this.score += this.sequentHollowNumber;     //连续进球积分
+            //播放普通球音效
+            cc.audioEngine.play(this.goalAudio,false,1);
             //播放空心球音效
             cc.audioEngine.play(this.hollowAudio,false,1);
             //空心
@@ -104,6 +107,16 @@ cc.Class({
         }
         this.score++;   //普通得分
         this.scoreLabel.string = this.score;
+
+        //存储最高分
+        if(cc.sys.localStorage.getItem('maxScore') < this.score) {
+            let maxScoreDisplay = this.score + "";
+            while(maxScoreDisplay.length < 6) {
+                maxScoreDisplay = " " + maxScoreDisplay;
+            }
+            cc.sys.localStorage.setItem('maxScore',maxScoreDisplay);
+        }
+        
     },
 
     /**
@@ -111,19 +124,26 @@ cc.Class({
      * @return {[type]} [description]
      */
     gameOver: function() {
-        //设置游戏状态为over
-        this.status = Status.Over;
+        let lastDisplay = this.score + "";
+        while(lastDisplay.length < 6) {
+            lastDisplay = " " + lastDisplay;
+        }
+        //存储上次得分
+        cc.sys.localStorage.setItem('lastTimeScore',lastDisplay);
         //注销touch事件
         this.node.off(cc.Node.EventType.TOUCH_START,
             this.ball.getComponent("Ball").controlBall,this.ball);
-        this.playBtn.active = true;    //显示开始按钮
-        this.mask.active = true;   //显示遮罩层
+         //设置游戏状态为over
+        this.status = Status.Over;
         //摧毁所有的篮筐
         this.getComponent("Rim").rims.forEach((rim,index) => {
             for(let key in rim) {
                 rim[key].destroy();
             }
         });
+        setTimeout(() => {
+            this.gameOverNode.active = true;
+        },2000);
         //播放结束音效
         cc.audioEngine.play(this.failAudio,false,1);
     },
@@ -142,7 +162,7 @@ cc.Class({
                             r: 156
                         };
                         this.rimFireTotalParticles = 10;    //篮筐的总粒子数
-                        this.ballFireTotalParticles = 10;   //篮球火的总粒子数
+                        this.ballFireTotalParticles = 20;   //篮球火的总粒子数
                         break;
                     case 2 :
                         this.color = {
@@ -151,8 +171,9 @@ cc.Class({
                             g: 232,
                             r: 255
                         };
+                        this.bg.runAction(cc.sequence(cc.moveBy(0.025,cc.p(0,13)),cc.moveBy(0.025,cc.p(0,-13))).repeat(3));
                         this.rimFireTotalParticles = 50;    //篮筐的总粒子数
-                        this.ballFireTotalParticles = 50;   //篮球火的总粒子数
+                        this.ballFireTotalParticles = 70;   //篮球火的总粒子数
                         break;
                     default :
                         this.color = {
@@ -161,8 +182,9 @@ cc.Class({
                             g: 63,
                             r: 252
                         };
+                        this.bg.runAction(cc.sequence(cc.moveBy(0.025,cc.p(0,13)),cc.moveBy(0.025,cc.p(0,-13))).repeat(3));
                         this.rimFireTotalParticles = 150;    //篮筐的总粒子数
-                        this.ballFireTotalParticles = 150;   //篮球火的总粒子数
+                        this.ballFireTotalParticles = 170;   //篮球火的总粒子数
                 }
         this.getComponent("Rim").rims[0].bottomRim.children[0].getComponent(cc.ParticleSystem).totalParticles = this.rimFireTotalParticles;
         this.ballFire.getComponent(cc.ParticleSystem).totalParticles = this.ballFireTotalParticles;
@@ -173,6 +195,14 @@ cc.Class({
         let display = this.sequentHollowNumber +1;
         //修改显示分数
         this.hollowLabel.children[0].getComponent(cc.Label).string = "x" + display;
+    },
+
+    /**
+     * home键
+     * @return {[type]} [description]
+     */
+    homeBtnClick: function() {
+        cc.director.loadScene("home");
     },
 
     // called every frame

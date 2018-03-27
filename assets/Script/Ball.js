@@ -1,4 +1,5 @@
 var initSpeed = 0;
+var ball = null;    //ball组件
 cc.Class({
     extends: cc.Component,
 
@@ -15,14 +16,23 @@ cc.Class({
         rimRelativeSpeed: 0,
         //game
         game: cc.Node,
+        rims: [],
         //touch音效
         touchAudio: cc.AudioClip,
-        ballFire: cc.Node     //球火
+        ballFire: cc.Node,     //球火
+        leftWing: cc.Node,  //左边翅膀
+        rightWing: cc.Node  //右边翅膀
     },
 
     onLoad: function() {
         this.node.setLocalZOrder(2);    //设置z轴的位置
         initSpeed = this.ballSpeed;
+        this.initLeft = this.leftWing.getPosition();
+        this.initRight = this.rightWing.getPosition();
+        ball = this;
+        ball.rigidBody = this.node.getComponent(cc.RigidBody);  //篮球刚体
+        this.Game = this.game.getComponent("Game");     //game组件
+        this.Rim = this.game.getComponent("Rim");
     },
 
     /**
@@ -30,7 +40,12 @@ cc.Class({
      * @return {[type]} [description]
      */
     init: function() {
-
+        this.leftWing.setPosition(this.initLeft);
+        this.leftWing.setRotation(0);
+        this.rightWing.setPosition(this.initRight);
+        this.rightWing.setRotation(0);
+        this.leftWing.removeComponent(cc.RigidBody);
+        this.rightWing.removeComponent(cc.RigidBody);
     },
 
     /**
@@ -38,17 +53,20 @@ cc.Class({
      * @return {[type]} [description]
      */
     controlBall: function() {
-        //this.node.getComponent(cc.RigidBody).linearDamping = 0;
         //播放touch音效
-        cc.audioEngine.play(this.getComponent("Ball").touchAudio,false,1);
-        if(this.getComponent(cc.RigidBody).type != 2) {
-            this.getComponent(cc.RigidBody).type = 2;
+        cc.audioEngine.play(ball.touchAudio,false,1);
+        if(ball.rigidBody.type != 2) {
+            ball.rigidBody.type = 2;
         }
         //这里的this是篮球刚体
-        this.node.getComponent(cc.RigidBody).linearVelocity = {x:initSpeed,y:0};
-        this.node.getComponent("Ball").ballSpeed = initSpeed;
+        ball.rigidBody.linearVelocity = {x:initSpeed,y:0};
+        ball.ballSpeed = initSpeed;
+        ball.leftWing.setRotation(0);
+        ball.rightWing.setRotation(0);
         //移动篮球
-        this.node.getComponent(cc.RigidBody).applyLinearImpulse(cc.v2(10,6000),this.getComponent(cc.RigidBody).getWorldCenter(),true);
+        ball.rigidBody.applyLinearImpulse(cc.v2(10,5800),ball.rigidBody.getWorldCenter(),true);
+        ball.leftWing.runAction(cc.rotateTo(0.2, 70));
+        ball.rightWing.runAction(cc.rotateTo(0.2, 70));
     },
 
     /**
@@ -76,8 +94,8 @@ cc.Class({
      * @return {[type]} [description]
      */
     update: function(dt) {
-
-        let status = this.game.getComponent("Game").status;     //游戏状态
+        this.ballFire.setRotation(-this.node.getRotation()); 
+        let status = this.Game.status;     //游戏状态
 
         if(status == 1) {
             //让背景循环
@@ -88,27 +106,29 @@ cc.Class({
             //超出相机范围，就移动背景和篮筐跟随
             if(this.node.x > this.camera.x + 0.5*this.camera.width || this.node.x < this.camera.x - 0.5*this.camera.width) {
                 this.node.x = -240;
-                this.bg.x -= this.getComponent(cc.RigidBody).linearVelocity.x*dt;
+                this.bg.x -= this.rigidBody.linearVelocity.x*dt;
                 //console.log(this.getComponent(cc.RigidBody).linearVelocity.x);
                 //速度衰减
-                if(this.getComponent(cc.RigidBody).linearVelocity.x > initSpeed+5) {
-                    this.node.getComponent(cc.RigidBody).linearDamping = 200;
-                }else if(this.getComponent(cc.RigidBody).linearVelocity.x < -120) {
-                    this.node.getComponent(cc.RigidBody).linearDamping = 4;
+                if(this.rigidBody.linearVelocity.x > initSpeed+5) {
+                    this.rigidBody.linearDamping = 200;
+                }else if(this.rigidBody.linearVelocity.x < -120) {
+                    this.rigidBody.linearDamping = 4;
                 }else{
-                    this.node.getComponent(cc.RigidBody).linearDamping = 0;
+                    this.rigidBody.linearDamping = 0;
                 }
-                //console.log(this.game.getComponent("Rim").rims[this.game.getComponent("Rim").rims.length-1].topRim.x);
+                if(this.Rim.rims[0].topRim.name == "") {
+                    this.Rim.rims.splice(0,1);
+                }
                 //检查第一个篮圈是否达到边界，是结束游戏
-                if(this.game.getComponent("Rim").rims.length > 0 && this.game.getComponent("Rim").rims[0].topRim.x + 360 < 0) {
-                    this.game.getComponent("Game").gameOver();
+                if(this.Rim.rims.length > 0 && this.Rim.rims[0].topRim.x + 500 < 0) {
+                    this.Game.gameOver();
                 }
-                this.game.getComponent("Rim").rims.forEach((rim,index) => {
-                //上下篮筐都移动，根据球的速度
-                for(let key in rim) {
-                    //console.log(rim[key]);
-                    rim[key].x -= (this.getComponent(cc.RigidBody).linearVelocity.x + this.rimRelativeSpeed)*dt;
-                }
+                this.Rim.rims.forEach((rim,index) => {
+                    //上下篮筐都移动，根据球的速度
+                    for(let key in rim) {
+                        rim[key].x -= (this.rigidBody.linearVelocity.x + this.rimRelativeSpeed)*dt;
+                        
+                    }
 
                 });
             } 

@@ -5,11 +5,14 @@ cc.Class({
     properties: {
         game: cc.Node,
         //撞击地板音效
-        colloisionGroundAudio: cc.AudioClip
+        colloisionGroundAudio: cc.AudioClip,
+        leftWing: cc.Node,  //左边翅膀
+        rightWing: cc.Node  //右边翅膀
     },
 
     onLoad: function() {
         this.lastTime = 0;
+        this.Game = this.game.getComponent("Game");
     },
 
     // 只在两个碰撞体开始接触时被调用一次
@@ -21,8 +24,10 @@ cc.Class({
         }
         //上次时间
         this.lastTime = new Date().getTime();
-        if(this.game.getComponent("Game").status == 1) {
-            this.game.getComponent("Game").gameOver();
+        if(this.Game.status == 1) {
+            this.leftWing.addComponent(cc.RigidBody);
+            this.rightWing.addComponent(cc.RigidBody);
+            this.Game.gameOver();
         }
     },
 
