@@ -1314,7 +1314,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 66.74,
+      "width": 70.74,
       "height": 120
     },
     "_rotationX": 0,
@@ -2036,6 +2036,12 @@
     },
     "bg": {
       "__id__": 3
+    },
+    "happyAudio": {
+      "__uuid__": "a5a76527-d854-49f1-b9f9-dfe49f1a8f9f"
+    },
+    "applauseAudio": {
+      "__uuid__": "27148b75-5683-4110-af49-0a82d66993e8"
     }
   },
   {

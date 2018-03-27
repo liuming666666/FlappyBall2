@@ -17,7 +17,9 @@ cc.Class({
         goalAudio: cc.AudioClip,     //得分音效
         hollowAudio: cc.AudioClip,   //空心音效
         ballFire: cc.Node,       //球火的节点
-        bg: cc.Node             //背景节点
+        bg: cc.Node,             //背景节点
+        happyAudio: cc.AudioClip,    //欢呼声音效
+        applauseAudio: cc.AudioClip     //鼓掌音效
        
     },
 
@@ -171,7 +173,9 @@ cc.Class({
                             g: 232,
                             r: 255
                         };
-                        this.bg.runAction(cc.sequence(cc.moveBy(0.025,cc.p(0,13)),cc.moveBy(0.025,cc.p(0,-13))).repeat(3));
+                        //鼓掌音效
+                        cc.audioEngine.play(this.applauseAudio,false,1);
+                        this.bg.runAction(cc.sequence(cc.moveBy(0.025,cc.p(0,-20)),cc.moveBy(0.025,cc.p(0,20))).repeat(3));
                         this.rimFireTotalParticles = 50;    //篮筐的总粒子数
                         this.ballFireTotalParticles = 70;   //篮球火的总粒子数
                         break;
@@ -182,7 +186,9 @@ cc.Class({
                             g: 63,
                             r: 252
                         };
-                        this.bg.runAction(cc.sequence(cc.moveBy(0.025,cc.p(0,13)),cc.moveBy(0.025,cc.p(0,-13))).repeat(3));
+                        //播放欢呼声音效
+                        cc.audioEngine.play(this.happyAudio,false,1);
+                        this.bg.runAction(cc.sequence(cc.moveBy(0.025,cc.p(0,-20)),cc.moveBy(0.025,cc.p(0,20))).repeat(3));
                         this.rimFireTotalParticles = 150;    //篮筐的总粒子数
                         this.ballFireTotalParticles = 170;   //篮球火的总粒子数
                 }
